@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IT Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #0a0a0a;
+      --card-bg: rgba(255, 255, 255, 0.05);
+      --accent: #ff7b00;
+      --text-color: #f5f5f5;
+      --blur: 25px;
+      --radius: 20px;
+      --green: #10b981;
+      --red: #ef4444;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', "SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-color);
+      color: var(--text-color);
+      min-height: 100vh;
+    }
+
+    header {
+      background: var(--card-bg);
+      backdrop-filter: blur(var(--blur));
+      padding: 25px 40px;
+      text-align: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    header h1 {
+      font-weight: 600;
+      font-size: 2rem;
+      color: var(--accent);
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+
+    #datetime {
+      font-size: 1.1rem;
+      color: #ccc;
+      font-weight: 500;
+    }
+
+    .main-content {
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+      max-width: 1800px;
+      margin: 0 auto;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 25px;
+      backdrop-filter: blur(30px);
+      box-shadow: 0 4px 40px rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      border-color: var(--accent);
+      box-shadow: 0 8px 60px rgba(255, 123, 0, 0.3);
+    }
+
+    .kpi {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .kpi .label {
+      color: var(--accent);
+      font-size: 0.85rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .kpi .value {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--text-color);
+    }
+
+    .system-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 25px;
+      backdrop-filter: blur(30px);
+      box-shadow: 0 4px 40px rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .stat-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .stat-label {
+      color: var(--accent);
+      font-size: 1rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .stat-value {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--text-color);
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 12px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 15px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--green));
+      border-radius: 10px;
+      transition: width 0.5s ease;
+    }
+
+    .tables-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+      gap: 25px;
+    }
+
+    .table-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 25px;
+      backdrop-filter: blur(30px);
+      box-shadow: 0 4px 40px rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .table-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .table-header .label {
+      color: var(--accent);
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+
+    .table-header .count {
+      color: #888;
+      font-size: 0.9rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    thead th {
+      text-align: left;
+      font-weight: 600;
+      color: #888;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    tbody td {
+      padding: 15px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      color: var(--text-color);
+    }
+
+    tbody tr {
+      transition: all 0.2s ease;
+    }
+
+    tbody tr:hover {
+      background: rgba(255, 123, 0, 0.05);
+    }
+
+    .badge {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .ok {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--green);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .bad {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--red);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .unknown {
+      background: rgba(255, 123, 0, 0.15);
+      color: var(--accent);
+      border: 1px solid rgba(255, 123, 0, 0.3);
+    }
+
+    .charts-section {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 25px;
+    }
+
+    .chart-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 25px;
+      backdrop-filter: blur(30px);
+      box-shadow: 0 4px 40px rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .chart-header {
+      color: var(--accent);
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    .chart-container {
+      height: 250px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    canvas {
+      max-width: 100%;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 0.85rem;
+      color: #888;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      margin-top: 40px;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.6s ease forwards;
+    }
+
+    @media (max-width: 768px) {
+      .main-content {
+        padding: 20px;
+      }
+      .cards {
+        grid-template-columns: 1fr;
+      }
+      .tables-container, .charts-section {
+        grid-template-columns: 1fr;
+      }
+      header h1 {
+        font-size: 1.5rem;
+      }
+      #datetime {
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>GHAC IT Monitoring Dashboard</h1>
+    <div id="datetime"></div>
+  </header>
+
+  <div class="main-content">
+    <div class="system-stats fade-in">
+      <div class="stat-card">
+        <div class="stat-header">
+          <span class="stat-label">CPU Usage</span>
+          <span class="stat-value" id="cpu-usage">0%</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="cpu-progress" style="width: 0%;"></div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-header">
+          <span class="stat-label">RAM Usage</span>
+          <span class="stat-value" id="ram-usage">0%</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="ram-progress" style="width: 0%;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cards fade-in">
+      <div class="card" id="switches-live-card">
+        <div class="kpi">
+          <span class="label">Switches - Live</span>
+          <span class="value" id="kpi-live">0</span>
+        </div>
+      </div>
+      <div class="card" id="switches-down-card">
+        <div class="kpi">
+          <span class="label">Switches - Down</span>
+          <span class="value" id="kpi-down">0</span>
+        </div>
+      </div>
+      <div class="card" id="cctv-live-card">
+        <div class="kpi">
+          <span class="label">CCTV - Live</span>
+          <span class="value" id="cctv-kpi-live">0</span>
+        </div>
+      </div>
+      <div class="card" id="cctv-down-card">
+        <div class="kpi">
+          <span class="label">CCTV - Down</span>
+          <span class="value" id="cctv-kpi-down">0</span>
+        </div>
+      </div>
+      <div class="card" id="ap-live-card">
+        <div class="kpi">
+          <span class="label">APs - Live</span>
+          <span class="value" id="ap-kpi-live">0</span>
+        </div>
+      </div>
+      <div class="card" id="ap-down-card">
+        <div class="kpi">
+          <span class="label">APs - Down</span>
+          <span class="value" id="ap-kpi-down">0</span>
+        </div>
+      </div>
+      <div class="card" id="cctv-server-live-card">
+        <div class="kpi">
+          <span class="label">Servers - Live</span>
+          <span class="value" id="cctv-server-kpi-live">0</span>
+        </div>
+      </div>
+      <div class="card" id="cctv-server-down-card">
+        <div class="kpi">
+          <span class="label">Servers - Down</span>
+          <span class="value" id="cctv-server-kpi-down">0</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="charts-section fade-in">
+      <div class="chart-card">
+        <div class="chart-header">Switch Status Distribution</div>
+        <div class="chart-container">
+          <canvas id="server-pie-chart" width="220" height="220"></canvas>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-header">Access Points Status</div>
+        <div class="chart-container">
+          <canvas id="ap-pie-chart" width="220" height="220"></canvas>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-header">CCTV Servers Status</div>
+        <div class="chart-container">
+          <canvas id="cctv-server-pie-chart" width="220" height="220"></canvas>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-header">CCTV Cameras Status</div>
+        <div class="chart-container">
+          <canvas id="cctv-pie-chart" width="220" height="220"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-card fade-in">
+      <div class="chart-header">Response Time Trends (Average Latency)</div>
+      <div style="height: 300px; position: relative;">
+        <canvas id="response-time-chart"></canvas>
+      </div>
+    </div>
+
+    <div class="tables-container fade-in">
+      <div class="table-card">
+        <div class="table-header">
+          <span class="label">Switches</span>
+          <span class="count" id="kpi-total">0 total</span>
+        </div>
+        <div style="overflow-x: auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>IP / Host</th>
+                <th>Status</th>
+                <th>Latency</th>
+                <th>Last Checked</th>
+                <th>Downtime</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="table-card">
+        <div class="table-header">
+          <span class="label">Servers</span>
+          <span class="count" id="cctv-server-kpi-total">0 total</span>
+        </div>
+        <div style="overflow-x: auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>IP / Host</th>
+                <th>Status</th>
+                <th>Latency</th>
+                <th>Last Checked</th>
+                <th>Downtime</th>
+              </tr>
+            </thead>
+            <tbody id="cctv-server-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="table-card">
+        <div class="table-header">
+          <span class="label">CCTV Cameras</span>
+          <span class="count" id="cctv-kpi-total">0 total</span>
+        </div>
+        <div style="overflow-x: auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>IP / Host</th>
+                <th>Status</th>
+                <th>Latency</th>
+                <th>Last Checked</th>
+                <th>Downtime</th>
+              </tr>
+            </thead>
+            <tbody id="cctv-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="table-card">
+        <div class="table-header">
+          <span class="label">Access Points</span>
+          <span class="count" id="ap-kpi-total">0 total</span>
+        </div>
+        <div style="overflow-x: auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>IP / Host</th>
+                <th>Status</th>
+                <th>Latency</th>
+                <th>Last Checked</th>
+                <th>Downtime</th>
+              </tr>
+            </thead>
+            <tbody id="ap-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      Statuses auto-refresh every 3 seconds. Edit switch.txt for switches, cctv.txt for CCTV, accesspoints.txt for APs, and cctv_servers.txt for servers.
+      <br /><br />Made with ❤️ & <span style="color: var(--accent); font-weight: 600;">Orange Fire</span> by <span style="color: var(--accent); font-weight: 600;">JK</span>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+  <script>
+    const tbody = document.getElementById('tbody');
+    const cctvTbody = document.getElementById('cctv-tbody');
+    const cctvServerTbody = document.getElementById('cctv-server-tbody');
+    const apTbody = document.getElementById('ap-tbody');
+    const kpiLive = document.getElementById('kpi-live');
+    const kpiDown = document.getElementById('kpi-down');
+    const kpiTotal = document.getElementById('kpi-total');
+    const cctvKpiLive = document.getElementById('cctv-kpi-live');
+    const cctvKpiDown = document.getElementById('cctv-kpi-down');
+    const cctvKpiTotal = document.getElementById('cctv-kpi-total');
+    const cctvServerKpiLive = document.getElementById('cctv-server-kpi-live');
+    const cctvServerKpiDown = document.getElementById('cctv-server-kpi-down');
+    const cctvServerKpiTotal = document.getElementById('cctv-server-kpi-total');
+    const apKpiLive = document.getElementById('ap-kpi-live');
+    const apKpiDown = document.getElementById('ap-kpi-down');
+    const apKpiTotal = document.getElementById('ap-kpi-total');
+    const datetimeElement = document.getElementById('datetime');
+    const cpuUsageElement = document.getElementById('cpu-usage');
+    const ramUsageElement = document.getElementById('ram-usage');
+    const cpuProgressElement = document.getElementById('cpu-progress');
+    const ramProgressElement = document.getElementById('ram-progress');
+
+    let responseTimeHistory = [];
+    const maxHistoryPoints = 20;
+    let lineChart = null;
+
+    const tableFilters = {
+      switches: 'down',
+      aps: 'down',
+      cctv: 'down',
+      servers: 'down'
+    };
+
+    function updateDateTime() {
+      const now = new Date();
+      const options = { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      };
+      datetimeElement.textContent = now.toLocaleDateString('en-US', options);
+    }
+
+    function updateSystemStats() {
+      const cpuUsage = Math.floor(Math.random() * 40 + 20);
+      const ramUsage = Math.floor(Math.random() * 30 + 40);
+      cpuUsageElement.textContent = cpuUsage + '%';
+      cpuProgressElement.style.width = cpuUsage + '%';
+      ramUsageElement.textContent = ramUsage + '%';
+      ramProgressElement.style.width = ramUsage + '%';
+    }
+
+    function fmtTime(ts) {
+      if (!ts) return '—';
+      const d = new Date(ts * 1000);
+      return d.toLocaleTimeString();
+    }
+
+    function formatDowntime(firstUnreachable, reachable) {
+      if (reachable !== false || !firstUnreachable) return '—';
+      const now = Math.floor(Date.now() / 1000);
+      const downtime = now - firstUnreachable;
+      if (downtime < 60) return downtime + 's';
+      if (downtime < 3600) return Math.floor(downtime / 60) + 'm';
+      if (downtime < 86400) return Math.floor(downtime / 3600) + 'h';
+      return Math.floor(downtime / 86400) + 'd';
+    }
+
+    function renderTable(ips, tbodyElement, filterMode) {
+      tbodyElement.innerHTML = '';
+      let entries = Object.entries(ips);
+      if (filterMode === 'down') {
+        entries = entries.filter(([ip, info]) => info.reachable === false);
+      } else if (filterMode === 'live') {
+        entries = entries.filter(([ip, info]) => info.reachable === true);
+      }
+      const sortedEntries = entries.sort(([ipA, infoA], [ipB, infoB]) => {
+        if (infoA.reachable === false && infoB.reachable !== false) return -1;
+        if (infoA.reachable !== false && infoB.reachable === false) return 1;
+        return ipA.localeCompare(ipB);
+      });
+      sortedEntries.forEach(([ip, info]) => {
+        const tr = document.createElement('tr');
+        const reachable = info.reachable;
+        let statusClass = 'unknown';
+        let statusText = 'Unknown';
+        if (reachable === true) { statusClass = 'ok'; statusText = 'Reachable'; }
+        else if (reachable === false) { statusClass = 'bad'; statusText = 'Unreachable'; }
+        const displayName = info.name && info.name !== ip ? info.name + ' (' + ip + ')' : ip;
+        tr.innerHTML = '<td title="' + displayName + '">' + displayName + '</td><td><span class="badge ' + statusClass + '">' + statusText + '</span></td><td>' + (info.latency_ms != null ? info.latency_ms.toFixed(1) + ' ms' : '—') + '</td><td>' + fmtTime(info.last_checked) + '</td><td>' + formatDowntime(info.first_unreachable, reachable) + '</td>';
+        tbodyElement.appendChild(tr);
+      });
+    }
+
+    function drawPieChart(canvasId, data) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      const radius = Math.min(centerX, centerY) - 10;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const total = data[0] + data[1];
+      if (total === 0) return;
+      const colors = ['#10b981', '#ef4444'];
+      let currentAngle = -Math.PI / 2;
+      data.forEach((value, index) => {
+        const sliceAngle = (value / total) * 2 * Math.PI;
+        ctx.beginPath();
+        ctx.moveTo(centerX, centerY);
+        ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + sliceAngle);
+        ctx.closePath();
+        ctx.fillStyle = colors[index];
+        ctx.fill();
+        currentAngle += sliceAngle;
+      });
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius * 0.5, 0, 2 * Math.PI);
+      ctx.fillStyle = '#0a0a0a';
+      ctx.fill();
+      ctx.fillStyle = '#f5f5f5';
+      ctx.font = 'bold 24px Inter';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(data[0], centerX, centerY - 10);
+      ctx.font = '12px Inter';
+      ctx.fillStyle = '#888';
+      ctx.fillText('Online', centerX, centerY + 10);
+    }
+
+    function initLineChart() {
+      const canvas = document.getElementById('response-time-chart');
+      const ctx = canvas.getContext('2d');
+      lineChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: [],
+          datasets: [{
+            label: 'Avg Latency (ms)',
+            data: [],
+            borderColor: '#ff7b00',
+            backgroundColor: 'rgba(255, 123, 0, 0.1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: '#ff7b00',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2,
+            pointRadius: 4,
+            pointHoverRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { labels: { color: '#ccc', font: { size: 12 } } },
+            tooltip: {
+              backgroundColor: 'rgba(10, 10, 10, 0.9)',
+              titleColor: '#ff7b00',
+              bodyColor: '#f5f5f5',
+              borderColor: 'rgba(255, 123, 0, 0.5)',
+              borderWidth: 1
+            }
+          },
+          scales: {
+            x: {
+              ticks: { color: '#888', font: { size: 11 } },
+              grid: { color: 'rgba(255, 255, 255, 0.05)' }
+            },
+            y: {
+              ticks: { color: '#888', font: { size: 11 } },
+              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    }
+
+    function updateLineChart(avgLatency) {
+      if (!lineChart) return;
+      responseTimeHistory.push(avgLatency);
+      if (responseTimeHistory.length > maxHistoryPoints) {
+        responseTimeHistory.shift();
+      }
+      lineChart.data.labels = responseTimeHistory.map((_, i) => i + 1);
+      lineChart.data.datasets[0].data = responseTimeHistory;
+      lineChart.update();
+    }
+
+    function render(data) {
+      const { ips, cctv_ips, ap_ips, cctv_server_ips, counts, cctv_counts, ap_counts, cctv_server_counts } = data;
+      if (counts) {
+        kpiLive.textContent = counts.live ?? 0;
+        kpiDown.textContent = counts.down ?? 0;
+        kpiTotal.textContent = (counts.total ?? 0) + ' total';
+      }
+      if (cctv_counts) {
+        cctvKpiLive.textContent = cctv_counts.live ?? 0;
+        cctvKpiDown.textContent = cctv_counts.down ?? 0;
+        cctvKpiTotal.textContent = (cctv_counts.total ?? 0) + ' total';
+      }
+      if (cctv_server_counts) {
+        cctvServerKpiLive.textContent = cctv_server_counts.live ?? 0;
+        cctvServerKpiDown.textContent = cctv_server_counts.down ?? 0;
+        cctvServerKpiTotal.textContent = (cctv_server_counts.total ?? 0) + ' total';
+      }
+      if (ap_counts) {
+        apKpiLive.textContent = ap_counts.live ?? 0;
+        apKpiDown.textContent = ap_counts.down ?? 0;
+        apKpiTotal.textContent = (ap_counts.total ?? 0) + ' total';
+      }
+      renderTable(ips, tbody, tableFilters.switches);
+      renderTable(cctv_server_ips, cctvServerTbody, tableFilters.servers);
+      renderTable(cctv_ips, cctvTbody, tableFilters.cctv);
+      renderTable(ap_ips, apTbody, tableFilters.aps);
+      drawPieChart('server-pie-chart', [counts.live || 0, counts.down || 0]);
+      drawPieChart('ap-pie-chart', [ap_counts.live || 0, ap_counts.down || 0]);
+      drawPieChart('cctv-server-pie-chart', [cctv_server_counts.live || 0, cctv_server_counts.down || 0]);
+      drawPieChart('cctv-pie-chart', [cctv_counts.live || 0, cctv_counts.down || 0]);
+      const allDevices = {...ips, ...cctv_ips, ...ap_ips, ...cctv_server_ips};
+      const devicesWithLatency = Object.values(allDevices).filter(info => info.latency_ms != null);
+      const avgLatency = devicesWithLatency.length > 0 ? devicesWithLatency.reduce((sum, info) => sum + info.latency_ms, 0) / devicesWithLatency.length : 0;
+      updateLineChart(avgLatency);
+    }
+
+    async function fetchStatus() {
+      try {
+        const res = await fetch('/api/status');
+        const data = await res.json();
+        render(data);
+      } catch (e) {
+        console.error('Error fetching status:', e);
+      }
+    }
+
+    document.getElementById('switches-live-card').addEventListener('click', () => {
+      tableFilters.switches = 'live';
+      fetchStatus();
+    });
+    document.getElementById('switches-down-card').addEventListener('click', () => {
+      tableFilters.switches = 'down';
+      fetchStatus();
+    });
+    document.getElementById('cctv-live-card').addEventListener('click', () => {
+      tableFilters.cctv = 'live';
+      fetchStatus();
+    });
+    document.getElementById('cctv-down-card').addEventListener('click', () => {
+      tableFilters.cctv = 'down';
+      fetchStatus();
+    });
+    document.getElementById('ap-live-card').addEventListener('click', () => {
+      tableFilters.aps = 'live';
+      fetchStatus();
+    });
+    document.getElementById('ap-down-card').addEventListener('click', () => {
+      tableFilters.aps = 'down';
+      fetchStatus();
+    });
+    document.getElementById('cctv-server-live-card').addEventListener('click', () => {
+      tableFilters.servers = 'live';
+      fetchStatus();
+    });
+    document.getElementById('cctv-server-down-card').addEventListener('click', () => {
+      tableFilters.servers = 'down';
+      fetchStatus();
+    });
+
+    updateDateTime();
+    setInterval(updateDateTime, 1000);
+    updateSystemStats();
+    setInterval(updateSystemStats, 5000);
+    initLineChart();
+    fetchStatus();
+    setInterval(fetchStatus, 3000);
+  </script>
+</body>
+</html>
